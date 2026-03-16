@@ -1,0 +1,221 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+.dash { padding: 1rem 0; }
+.header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 8px; }
+.fund-name { font-size: 20px; font-weight: 500; color: var(--color-text-primary); }
+.fund-sub { font-size: 13px; color: var(--color-text-secondary); margin-top: 2px; }
+.badge { font-size: 11px; padding: 3px 10px; border-radius: var(--border-radius-md); background: var(--color-background-success); color: var(--color-text-success); font-weight: 500; }
+.badge.neg { background: var(--color-background-danger); color: var(--color-text-danger); }
+.metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+.metric { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 14px; }
+.metric-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+.metric-value { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+.metric-sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+.metric-value.pos { color: #1D9E75; }
+.metric-value.neg { color: #D85A30; }
+.section { margin-bottom: 1.5rem; }
+.section-title { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+.charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 1.5rem; }
+.chart-box { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 14px; }
+.chart-title { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 10px; }
+.holdings { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; }
+.holdings table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.holdings th { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.04em; padding: 10px 14px; text-align: left; border-bottom: 0.5px solid var(--color-border-tertiary); background: var(--color-background-secondary); }
+.holdings td { padding: 10px 14px; color: var(--color-text-primary); border-bottom: 0.5px solid var(--color-border-tertiary); }
+.holdings tr:last-child td { border-bottom: none; }
+.holdings tr:hover td { background: var(--color-background-secondary); }
+.pnl-pos { color: #1D9E75; font-weight: 500; }
+.pnl-neg { color: #D85A30; font-weight: 500; }
+.sector-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+.legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; font-size: 11px; color: var(--color-text-secondary); }
+.legend span { display: flex; align-items: center; gap: 4px; }
+.legend-sq { width: 10px; height: 10px; border-radius: 2px; }
+.input-row { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
+.input-row input { font-size: 13px; padding: 6px 10px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); width: 120px; }
+.input-row button { font-size: 12px; padding: 6px 12px; }
+.tabs { display: flex; gap: 4px; margin-bottom: 1rem; }
+.tab { font-size: 12px; padding: 5px 12px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); cursor: pointer; color: var(--color-text-secondary); background: transparent; }
+.tab.active { background: var(--color-background-secondary); color: var(--color-text-primary); font-weight: 500; border-color: var(--color-border-secondary); }
+@media (max-width: 500px) { .charts-row { grid-template-columns: 1fr; } }
+</style>
+
+<div class="dash">
+  <div class="header">
+    <div>
+      <div class="fund-name">Julien Carbonnel — PEA Fund</div>
+      <div class="fund-sub">Fonds actions européennes · Gestion active · Benchmark Euro Stoxx 50</div>
+    </div>
+    <span class="badge" id="ytd-badge">+12.4% YTD</span>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="setTab('overview')">Vue d'ensemble</button>
+    <button class="tab" onclick="setTab('holdings')">Positions</button>
+    <button class="tab" onclick="setTab('risk')">Risque</button>
+  </div>
+
+  <div id="tab-overview">
+    <div class="metrics">
+      <div class="metric"><div class="metric-label">Valeur du fonds</div><div class="metric-value" id="m-nav">52 400 €</div><div class="metric-sub">+12.4% YTD</div></div>
+      <div class="metric"><div class="metric-label">Alpha (ann.)</div><div class="metric-value pos" id="m-alpha">+3.2%</div><div class="metric-sub">vs Euro Stoxx 50</div></div>
+      <div class="metric"><div class="metric-label">Sharpe ratio</div><div class="metric-value pos" id="m-sharpe">1.41</div><div class="metric-sub">objectif > 1</div></div>
+      <div class="metric"><div class="metric-label">Beta</div><div class="metric-value" id="m-beta">0.82</div><div class="metric-sub">légèrement défensif</div></div>
+      <div class="metric"><div class="metric-label">Volatilité ann.</div><div class="metric-value" id="m-vol">14.2%</div><div class="metric-sub">bench: 16.8%</div></div>
+      <div class="metric"><div class="metric-label">Max drawdown</div><div class="metric-value neg" id="m-dd">-8.3%</div><div class="metric-sub">bench: -11.2%</div></div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-box">
+        <div class="chart-title">Performance vs benchmark (12 mois)</div>
+        <div class="legend">
+          <span><span class="legend-sq" style="background:#185FA5"></span>Mon fonds</span>
+          <span><span class="legend-sq" style="background:#B4B2A9"></span>Euro Stoxx 50</span>
+        </div>
+        <div style="position:relative;height:200px;"><canvas id="perfChart"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">Répartition sectorielle</div>
+        <div class="legend" id="sector-legend"></div>
+        <div style="position:relative;height:200px;"><canvas id="sectorChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-holdings" style="display:none;">
+    <div class="input-row">
+      <input id="new-ticker" placeholder="Ticker (ex: TTE)" />
+      <input id="new-weight" placeholder="Poids %" type="number" />
+      <input id="new-pnl" placeholder="P&L %" type="number" />
+      <button onclick="addHolding()">Ajouter ↗</button>
+    </div>
+    <div class="holdings">
+      <table>
+        <thead><tr><th>Valeur</th><th>Secteur</th><th>Poids</th><th>P&L</th><th>Signal</th></tr></thead>
+        <tbody id="holdings-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="tab-risk" style="display:none;">
+    <div class="metrics">
+      <div class="metric"><div class="metric-label">VaR 95% (1j)</div><div class="metric-value neg">-1.8%</div><div class="metric-sub">perte max probable</div></div>
+      <div class="metric"><div class="metric-label">VaR 99% (1j)</div><div class="metric-value neg">-2.6%</div><div class="metric-sub">scénario adverse</div></div>
+      <div class="metric"><div class="metric-label">Tracking error</div><div class="metric-value">4.1%</div><div class="metric-sub">écart vs benchmark</div></div>
+      <div class="metric"><div class="metric-label">Ratio info</div><div class="metric-value pos">0.78</div><div class="metric-sub">objectif > 0.5</div></div>
+      <div class="metric"><div class="metric-label">Concentration top 5</div><div class="metric-value">48%</div><div class="metric-sub">risque spécifique</div></div>
+      <div class="metric"><div class="metric-label">Corrélation bench</div><div class="metric-value">0.87</div><div class="metric-sub">vs Euro Stoxx 50</div></div>
+    </div>
+    <div class="chart-box" style="margin-top:8px;">
+      <div class="chart-title">Distribution des rendements mensuels</div>
+      <div style="position:relative;height:220px;"><canvas id="distChart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const holdings = [
+  { name: 'TotalEnergies', ticker: 'TTE', sector: 'Énergie', weight: 12, pnl: 18.2 },
+  { name: 'Air Liquide', ticker: 'AI', sector: 'Industrie', weight: 11, pnl: 9.4 },
+  { name: 'LVMH', ticker: 'MC', sector: 'Luxe', weight: 10, pnl: -4.1 },
+  { name: 'Schneider Electric', ticker: 'SU', sector: 'Industrie', weight: 9, pnl: 22.7 },
+  { name: 'BNP Paribas', ticker: 'BNP', sector: 'Finance', weight: 8, pnl: 14.3 },
+  { name: 'Airbus', ticker: 'AIR', sector: 'Industrie', weight: 8, pnl: 6.8 },
+  { name: 'Sanofi', ticker: 'SAN', sector: 'Santé', weight: 7, pnl: 3.2 },
+  { name: 'Stellantis', ticker: 'STLA', sector: 'Auto', weight: 6, pnl: -11.4 },
+  { name: 'Vinci', ticker: 'DG', sector: 'Construction', weight: 5, pnl: 8.9 },
+  { name: 'Autres', ticker: '—', sector: 'Divers', weight: 24, pnl: 5.1 },
+];
+
+const sectorColors = {
+  'Énergie': '#185FA5', 'Industrie': '#1D9E75', 'Luxe': '#D4537E',
+  'Finance': '#BA7517', 'Santé': '#534AB7', 'Auto': '#D85A30',
+  'Construction': '#639922', 'Divers': '#888780'
+};
+
+function renderHoldings() {
+  const tbody = document.getElementById('holdings-body');
+  tbody.innerHTML = holdings.map(h => `
+    <tr>
+      <td><strong>${h.ticker}</strong> <span style="color:var(--color-text-secondary);font-size:11px;">${h.name}</span></td>
+      <td><span class="sector-dot" style="background:${sectorColors[h.sector]||'#888'}"></span>${h.sector}</td>
+      <td>${h.weight}%</td>
+      <td class="${h.pnl >= 0 ? 'pnl-pos' : 'pnl-neg'}">${h.pnl >= 0 ? '+' : ''}${h.pnl.toFixed(1)}%</td>
+      <td style="font-size:11px;color:${h.pnl > 10 ? '#1D9E75' : h.pnl < -5 ? '#D85A30' : 'var(--color-text-secondary)'}">
+        ${h.pnl > 10 ? 'Conserver' : h.pnl < -5 ? 'Surveiller' : 'Neutre'}
+      </td>
+    </tr>`).join('');
+}
+
+function addHolding() {
+  const t = document.getElementById('new-ticker').value.toUpperCase();
+  const w = parseFloat(document.getElementById('new-weight').value);
+  const p = parseFloat(document.getElementById('new-pnl').value);
+  if (!t || isNaN(w) || isNaN(p)) return;
+  holdings.push({ name: t, ticker: t, sector: 'Divers', weight: w, pnl: p });
+  renderHoldings();
+  document.getElementById('new-ticker').value = '';
+  document.getElementById('new-weight').value = '';
+  document.getElementById('new-pnl').value = '';
+}
+
+function setTab(name) {
+  ['overview','holdings','risk'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = t === name ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab').forEach((b,i) => {
+    b.classList.toggle('active', ['overview','holdings','risk'][i] === name);
+  });
+}
+
+const months = ['Avr','Mai','Jui','Jul','Aoû','Sep','Oct','Nov','Déc','Jan','Fév','Mar'];
+const fundPerf = [2.1, 3.4, 1.8, -1.2, 4.2, 2.8, -0.9, 3.1, 1.4, 2.7, -0.3, 1.8];
+const benchPerf = [1.8, 2.9, 1.2, -2.1, 3.4, 1.9, -1.8, 2.4, 0.8, 1.9, -1.1, 0.9];
+const fundCum = [], benchCum = [];
+let fc = 100, bc = 100;
+fundPerf.forEach(r => { fc *= (1 + r/100); fundCum.push(parseFloat(fc.toFixed(2))); });
+benchPerf.forEach(r => { bc *= (1 + r/100); benchCum.push(parseFloat(bc.toFixed(2))); });
+
+new Chart(document.getElementById('perfChart'), {
+  type: 'line',
+  data: {
+    labels: months,
+    datasets: [
+      { label: 'Mon fonds', data: fundCum, borderColor: '#185FA5', backgroundColor: 'rgba(24,95,165,0.08)', borderWidth: 2, pointRadius: 2, tension: 0.3, fill: true },
+      { label: 'Euro Stoxx 50', data: benchCum, borderColor: '#B4B2A9', borderWidth: 1.5, pointRadius: 0, tension: 0.3, borderDash: [4,3] }
+    ]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: v => v.toFixed(0), font: { size: 11 } }, grid: { color: 'rgba(128,128,128,0.1)' } }, x: { ticks: { font: { size: 11 } }, grid: { display: false } } } }
+});
+
+const sectors = {};
+holdings.forEach(h => { sectors[h.sector] = (sectors[h.sector] || 0) + h.weight; });
+const sLabels = Object.keys(sectors);
+const sData = sLabels.map(l => sectors[l]);
+const sColors = sLabels.map(l => sectorColors[l] || '#888');
+
+const legend = document.getElementById('sector-legend');
+legend.innerHTML = sLabels.map((l,i) => `<span><span class="legend-sq" style="background:${sColors[i]}"></span>${l} ${sData[i]}%</span>`).join('');
+
+new Chart(document.getElementById('sectorChart'), {
+  type: 'doughnut',
+  data: { labels: sLabels, datasets: [{ data: sData, backgroundColor: sColors, borderWidth: 1, borderColor: 'var(--color-background-primary)' }] },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '60%' }
+});
+
+new Chart(document.getElementById('distChart'), {
+  type: 'bar',
+  data: {
+    labels: ['< -3%', '-3/-2%', '-2/-1%', '-1/0%', '0/1%', '1/2%', '2/3%', '> 3%'],
+    datasets: [
+      { label: 'Mon fonds', data: [0, 1, 2, 3, 4, 5, 2, 1], backgroundColor: 'rgba(24,95,165,0.7)' },
+      { label: 'Benchmark', data: [1, 1, 3, 3, 3, 3, 2, 0], backgroundColor: 'rgba(180,178,169,0.5)' }
+    ]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { font: { size: 10 } }, grid: { display: false } }, y: { ticks: { font: { size: 11 } }, grid: { color: 'rgba(128,128,128,0.1)' } } } }
+});
+
+renderHoldings();
+</script>
